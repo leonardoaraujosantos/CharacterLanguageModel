@@ -1,11 +1,11 @@
 import torch
 import torch.distributions
 import numpy as np
-import utils_char
-import models
+import utils_char_dataset
+import model as models
 
 def getNextChar(chars, num_chars, model, device, codemap, greedly=True):        
-    chars_class = [utils_char.class_id_from_char(char, codemap) for char in chars]
+    chars_class = [utils_char_dataset.class_id_from_char(char, codemap) for char in chars]
     len_input = len(chars_class)    
     input = torch.tensor(chars_class).type(torch.LongTensor).unsqueeze(0).to(device)    
     len_input = torch.tensor(len_input).unsqueeze(0).to(device)    
@@ -37,14 +37,14 @@ def getNextChar(chars, num_chars, model, device, codemap, greedly=True):
             
             input = pred_class
             pred_class_lst.append(input.item())
-            if pred_class.item() == utils_char.class_id_from_char(utils_char.EOS_token, codemap):
+            if pred_class.item() == utils_char_dataset.class_id_from_char(utils_char_dataset.EOS_token, codemap):
                 break                            
     
     return pred_class_lst
 
 
 def getProbabilitySentence(word, model, device, codemap):        
-    chars_class = [utils_char.class_id_from_char(char, codemap) for char in word]
+    chars_class = [utils_char_dataset.class_id_from_char(char, codemap) for char in word]
     num_chars = len(chars_class)        
     curr_batch_size = 1            
     model.eval()
