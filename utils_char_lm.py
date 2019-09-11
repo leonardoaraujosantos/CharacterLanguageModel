@@ -44,16 +44,20 @@ def getNextChar(chars, num_chars, model, device, codemap, greedly=True):
 
 
 def getProbabilitySentence(word, model, device, codemap):        
+    # Convert each character on the word into it's class id
     chars_class = [utils_char_dataset.class_id_from_char(char, codemap) for char in word]
     num_chars = len(chars_class)        
     curr_batch_size = 1            
     model.eval()
     scores_lst = []
     with torch.no_grad():
+        # Initialize model on the beginning of the sequence
         hidden_state = models.initHidden(curr_batch_size, False, model.hidden_size, model.num_layers, device)
         # Return greedly the next char
         for idx in range(num_chars):
-            input = torch.tensor(chars_class[idx]).type(torch.LongTensor).unsqueeze(0).unsqueeze(0).to(device)            
+            # Convert class word index to a tensor
+            input = torch.tensor(chars_class[idx]).type(torch.LongTensor).unsqueeze(0).unsqueeze(0).to(device)   
+            # Push input(character) to the model
             probabilities, hidden_state = model(input, hidden_state, torch.tensor(1).unsqueeze(0))
             # Get the probability of the next input character given the previous inputs 
             if idx < num_chars - 1:
