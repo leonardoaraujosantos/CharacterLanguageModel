@@ -2,7 +2,7 @@ import torch
 import torch.distributions
 import numpy as np
 import utils_char_dataset
-import model as models
+import models
 
 def getNextChar(chars, num_chars, model, device, codemap, greedly=True):        
     chars_class = [utils_char_dataset.class_id_from_char(char, codemap) for char in chars]
