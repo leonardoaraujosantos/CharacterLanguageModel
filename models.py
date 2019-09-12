@@ -50,8 +50,9 @@ class CharLangModel(nn.Module):
         # Apply Linear (FC) layer       
         linear_out = self.out(output)        
         
-        # Use F.Softmax for CrossEntropy and LogSoftmax for NLLLoss
-        output = F.softmax(linear_out, dim=1)        
+        # We will use CrossEntropy so there is no need of Softmax Here
+        #output = F.softmax(linear_out, dim=1)  
+        output = linear_out
         
         # (batch_size * seq_len, hidden_size) -> (batch_size, seq_len, output_size)
         output = output.view(batch_size, seq_len, self.output_size)        
