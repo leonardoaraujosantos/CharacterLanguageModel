@@ -14,13 +14,14 @@ def initHidden(batch_size, bidirectional, hidden_size, num_layers, device):
 
 # Simple Character Language Model
 class CharLangModel(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size, num_layers=3, dropout=0.2):
+    def __init__(self, input_size, hidden_size, output_size, num_layers=3, dropout=0.5):
         super(CharLangModel, self).__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers         
         self.output_size = output_size
 
-        self.embedding = nn.Embedding(input_size, hidden_size)        
+        self.embedding = nn.Embedding(input_size, hidden_size)   
+        self.drop = nn.Dropout(dropout)
         self.gru = nn.GRU(hidden_size, hidden_size, num_layers=num_layers, batch_first=True, dropout=dropout)
         self.out = nn.Linear(hidden_size, output_size)
 
@@ -29,18 +30,21 @@ class CharLangModel(nn.Module):
         # pack_padded_sequence so that padded items in the sequence won't be shown to the LSTM      
         # The default order is (seq_len, batch, input_size)        
         batch_size, seq_len = input.size()        
-        embedded = self.embedding(input)
+        embedded = self.drop(self.embedding(input))
         embedded = F.relu(embedded)        
         
         # Pack sequence B x T x * where T is the length of the longest sequence and B is the batch size
         packed = torch.nn.utils.rnn.pack_padded_sequence(embedded, input_len, enforce_sorted=False, batch_first=True)
         # The default order is (seq_len, batch, input_size)
         output, hidden = self.gru(packed, hidden)
+        
         # unpack (back to padded)        
-        output, _ = torch.nn.utils.rnn.pad_packed_sequence(output, batch_first=True, total_length=seq_len)         
+        output, _ = torch.nn.utils.rnn.pad_packed_sequence(output, batch_first=True, total_length=seq_len) 
         
         # (batch_size, seq_len, nb_lstm_units) -> (batch_size * seq_len, nb_lstm_units)
         output = output.contiguous()
+        # Apply Dropout again
+        output = self.drop(output)
         output = output.view(-1, output.shape[2])        
         
         # Apply Linear (FC) layer       
