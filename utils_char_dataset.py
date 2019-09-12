@@ -1,6 +1,4 @@
 from io import open
-import glob
-import os
 import unicodedata
 import string
 import numpy as np
@@ -39,7 +37,7 @@ def class_id_from_char(char, codemap):
             # Find key from value on dictionary
             return list(codemap.keys())[list(codemap.values()).index(char)]
         except:
-            print('Class not found:', ascii_code)
+            print('Class not found:', char)
             raise IndexError
 
 def char_from_class_id(class_id, codemap):

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import math
+
 
 # Initialize RNN to "start" state
 def initHidden(batch_size, bidirectional, hidden_size, num_layers, device):
@@ -58,4 +58,3 @@ class CharLangModel(nn.Module):
         output = output.view(batch_size, seq_len, self.output_size)        
         
         return output, hidden
-    
